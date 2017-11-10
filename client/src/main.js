@@ -27,24 +27,12 @@ firebase.initializeApp(config)
 
 const db = firebase.database()
 Vue.prototype.$db = db
+Vue.prototype.$auth = firebase.auth()
 
-let app
-
-firebase.auth().onAuthStateChanged(function (user) {
-  if (user) Vue.prototype.$user = user
-  if (!app) {
-    /* eslint-disable no-new */
-    app = new Vue({
-      el: '#app',
-      user,
-      data: {
-        username: user.displayName,
-        uid: user.uid,
-        mangoTree: Vue.prototype.$db.ref('/users/' + user.uid)
-      },
-      router,
-      template: '<App/>',
-      components: { App }
-    })
-  }
+/* eslint-disable no-new */
+new Vue({
+  el: '#app',
+  router,
+  template: '<App/>',
+  components: { App }
 })

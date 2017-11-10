@@ -24,7 +24,6 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import firebase from 'firebase'
 import MangoTree from './../mango_tree/mango-tree'
 
@@ -32,20 +31,18 @@ export default {
   name: 'Home',
   data () {
     return {
-      username: this.$user.displayName,
       snackmsg: ''
     }
   },
   firebase () {
     return {
-      mangoTree: this.$db.ref('/users/' + this.$user.uid)
+      mangoTree: this.$db.ref('/users/' + this.uid)
     }
   },
   methods: {
     signout: function () {
       firebase.auth().signOut()
       .then(() => {
-        Vue.prototype.$user = null
         this.$router.replace('signin')
       })
     },
@@ -65,11 +62,11 @@ export default {
         let rottenFruits = Math.round((Math.random() * (harvested - 1) + 1) * 0.3)
         let freshFruitsHarvested = harvested - rottenFruits
 
-        this.$db.ref('/users/' + this.$user.uid)
+        this.$db.ref('/users/' + this.uid)
         .child('harvestedFruits')
         .set(currentHarvestedFruits += freshFruitsHarvested)
 
-        this.$db.ref('/users/' + this.$user.uid)
+        this.$db.ref('/users/' + this.uid)
         .child('fruits')
         .set(currentFruits -= harvested)
 
@@ -80,7 +77,7 @@ export default {
     },
     reset () {
       const newMangoTree = MangoTree.create()
-      this.$db.ref('/users/' + this.$user.uid).set(newMangoTree)
+      this.$db.ref('/users/' + this.uid).set(newMangoTree)
     }
   },
   computed: {
@@ -97,6 +94,12 @@ export default {
         obj[key] = value
         return obj
       }, {})
+    },
+    username () {
+      return this.$auth.currentUser.displayName // localStorage.getItem('username')
+    },
+    uid () {
+      return this.$auth.currentUser.uid // localStorage.getItem('uid')
     }
   }
 }

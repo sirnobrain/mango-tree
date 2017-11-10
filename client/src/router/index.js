@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import firebase from 'firebase'
 import Home from '@/components/Home'
 import Signin from '@/components/Signin'
 import Signup from '@/components/Signup'
@@ -15,7 +14,7 @@ let router = new Router({
     },
     {
       path: '/',
-      redirect: '/signin'
+      redirect: '/home'
     },
     {
       path: '/signin',
@@ -37,11 +36,19 @@ let router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
-  let currentUser = firebase.auth().currentUser
   let requiresAuth = to.matched.some(record => record.meta.requiresAuth)
-  if (requiresAuth && !currentUser) next('/signin')
-  else if (!requiresAuth && currentUser) next('/home')
-  else next()
+
+  if (requiresAuth) {
+    Vue.prototype.$auth.onAuthStateChanged(function (user) {
+      if (user !== null) {
+        next()
+      } else {
+        next('/signin')
+      }
+    })
+  } else {
+    next()
+  }
 })
 
 export default router
